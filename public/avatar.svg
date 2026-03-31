@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none">
+  <!-- Background Circle -->
+  <circle cx="200" cy="200" r="180" fill="#2D5016" opacity="0.1"/>
+  
+  <!-- Hat (Ranger Hat) -->
+  <path d="M120 160 Q140 120 200 120 Q260 120 280 160 L290 180 Q280 200 200 200 Q120 200 110 180 Z" fill="#8B4513"/>
+  <path d="M110 180 Q120 160 200 160 Q280 160 290 180" stroke="#5D2E0D" stroke-width="2"/>
+  
+  <!-- Face -->
+  <ellipse cx="200" cy="240" rx="80" ry="90" fill="#F4D03F" opacity="0.9"/>
+  
+  <!-- Eyes -->
+  <ellipse cx="170" cy="220" rx="12" ry="14" fill="#2D5016"/>
+  <ellipse cx="230" cy="220" rx="12" ry="14" fill="#2D5016"/>
+  <circle cx="173" cy="217" r="4" fill="white"/>
+  <circle cx="233" cy="217" r="4" fill="white"/>
+  
+  <!-- Eyebrows -->
+  <path d="M155 200 Q170 195 185 200" stroke="#2D5016" stroke-width="3" stroke-linecap="round"/>
+  <path d="M215 200 Q230 195 245 200" stroke="#2D5016" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- Nose -->
+  <path d="M195 240 Q200 250 205 240" stroke="#D4AC0D" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- Smile -->
+  <path d="M160 270 Q200 300 240 270" stroke="#2D5016" stroke-width="4" stroke-linecap="round" fill="none"/>
+  
+  <!-- Body (Ranger Shirt) -->
+  <path d="M120 320 Q120 280 200 280 Q280 280 280 320 L300 400 L100 400 Z" fill="#2D5016"/>
+  
+  <!-- Shield Badge -->
+  <path d="M180 300 L200 290 L220 300 L220 340 Q200 360 180 340 Z" fill="#FFD700"/>
+  <path d="M190 315 L200 310 L210 315 L210 335 Q200 345 190 335 Z" fill="#2D5016"/>
+  
+  <!-- Leaf Decorations -->
+  <g fill="#4A7A2A">
+    <ellipse cx="130" cy="180" rx="15" ry="25" transform="rotate(-30 130 180)"/>
+    <ellipse cx="270" cy="180" rx="15" ry="25" transform="rotate(30 270 180)"/>
+  </g>
+  
+  <!-- Sparkles -->
+  <circle cx="150" cy="150" r="4" fill="#FFD700"/>
+  <circle cx="250" cy="150" r="4" fill="#FFD700"/>
+  <circle cx="200" cy="130" r="5" fill="#FFD700"/>
+</svg>
