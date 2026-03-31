@@ -122,6 +122,30 @@ export async function getLastSpraying(): Promise<OrchardActivity | null> {
 }
 
 /**
+ * Get latest activity for a specific plot and type
+ */
+export async function getLatestActivity(
+  plot: string,
+  type: 'watering' | 'spraying' | 'fertilizing' | 'harvesting' | 'pruning' | 'observation'
+): Promise<OrchardActivity | null> {
+  const { data, error } = await supabase
+    .from('orchard_activities')
+    .select('*')
+    .eq('plot_name', plot)
+    .eq('activity_type', type)
+    .is('deleted_at', null)
+    .order('activity_date', { ascending: false })
+    .limit(1)
+    .single()
+
+  if (error || !data) {
+    return null
+  }
+
+  return data
+}
+
+/**
  * Helper: Calculate days since a given date
  */
 function getDaysSince(date: string): number {

@@ -1,0 +1,66 @@
+import { WateringWidget } from '@/components/widgets/WateringWidget'
+
+export default function DashboardPage() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="container mx-auto px-4 py-4">
+          <h1 className="text-2xl font-bold text-primary-900">
+            🌿 Dashboard - Oracle Orchard
+          </h1>
+          <p className="text-sm text-neutral-600 mt-1">
+            ติดตามกิจกรรมสวนแบบเรียลไทม์
+          </p>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-8">
+        {/* Activity Widgets Grid */}
+        <div className="mb-8">
+          <h2 className="text-lg font-semibold text-neutral-800 mb-4">
+            💧 การรดน้ำ
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <WateringWidget plot="suan_ban" />
+            {/* More watering widgets will be added here */}
+          </div>
+        </div>
+
+        {/* Coming Soon Sections */}
+        <div className="space-y-8">
+          {/* Spraying Section */}
+          <div>
+            <h2 className="text-lg font-semibold text-neutral-800 mb-4">
+              🎯 การพ่นยา
+            </h2>
+            <div className="bg-white rounded-lg shadow-md p-6 text-center text-neutral-500">
+              <p>Coming soon...</p>
+            </div>
+          </div>
+
+          {/* Fertilizing Section */}
+          <div>
+            <h2 className="text-lg font-semibold text-neutral-800 mb-4">
+              🌱 การใส่ปุ๋ย
+            </h2>
+            <div className="bg-white rounded-lg shadow-md p-6 text-center text-neutral-500">
+              <p>Coming soon...</p>
+            </div>
+          </div>
+
+          {/* Spray Decision Section */}
+          <div>
+            <h2 className="text-lg font-semibold text-neutral-800 mb-4">
+              🤔 วันนี้พ่นยาได้ไหม?
+            </h2>
+            <div className="bg-white rounded-lg shadow-md p-6 text-center text-neutral-500">
+              <p>Coming soon...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
