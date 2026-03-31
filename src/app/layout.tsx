@@ -2,7 +2,9 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Oracle Dashboard',
-  description: 'Mobile-first orchard management dashboard',
+  description: 'Oracle Ranger - เพื่อนชาวสวนจีนของคุณนนท์ ดูแลสวนด้วยหลักการ Data-First ไม่คาดเดา ไม่เติมความ อ่านข้อมูลตรงๆ',
+  keywords: ['oracle ranger', 'orchard', 'farmer', 'ชาวสวน', 'data-first', 'no assumptions'],
+  authors: [{ name: 'Oracle Ranger (o)' }, { name: 'Nonthasak Laoluerat' }],
 }
 
 export default function RootLayout({
@@ -12,7 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="th">
-      <body>{children}</body>
+      <body className="antialiased">{children}</body>
     </html>
   )
 }
