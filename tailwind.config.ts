@@ -12,30 +12,30 @@ const config: Config = {
       colors: {
         // Orchard Theme: Forest Green + Wood Brown + Golden Sun
         primary: {
-          DEFAULT: 'var(--color-primary)',
-          dark: 'var(--color-primary-dark)',
-          light: 'var(--color-primary-light)',
+          DEFAULT: '#2D5016',
+          dark: '#1A3009',
+          light: '#4A7A2A',
         },
         secondary: {
-          DEFAULT: 'var(--color-secondary)',
-          dark: 'var(--color-secondary-dark)',
+          DEFAULT: '#8B4513',
+          dark: '#5D2E0D',
         },
         accent: {
-          DEFAULT: 'var(--color-accent)',
-          light: 'var(--color-accent-light)',
+          DEFAULT: '#FFD700',
+          light: '#FFED4E',
         },
         // Neutral colors
         neutral: {
-          50: 'var(--color-neutral-50)',
-          100: 'var(--color-neutral-100)',
-          200: 'var(--color-neutral-200)',
+          50: '#F9FAFB',
+          100: '#F3F4F6',
+          200: '#E5E7EB',
           300: '#D1D5DB',
           400: '#9CA3AF',
           500: '#6B7280',
           600: '#4B5563',
           700: '#374151',
-          800: 'var(--color-neutral-800)',
-          900: 'var(--color-neutral-900)',
+          800: '#1F2937',
+          900: '#111827',
         },
         // Status colors
         success: '#10B981',
