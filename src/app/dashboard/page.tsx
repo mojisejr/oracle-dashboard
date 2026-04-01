@@ -1,5 +1,6 @@
 import { WateringWidget } from '@/components/widgets/WateringWidget'
 import { SprayingWidget } from '@/components/widgets/SprayingWidget'
+import { FertilizingWidget } from '@/components/widgets/FertilizingWidget'
 
 export default function DashboardPage() {
   return (
@@ -18,7 +19,7 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        {/* Activity Widgets Grid */}
+        {/* Watering Section */}
         <div className="mb-8">
           <h2 className="text-lg font-semibold text-neutral-800 mb-4">
             💧 การรดน้ำ
@@ -26,48 +27,35 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <WateringWidget plot="suan_ban" />
           </div>
+        </div>
 
-          {/* Spraying Section */}
-          <div className="mt-8">
-            <h2 className="text-lg font-semibold text-neutral-800 mb-4">
-              🧪 การพ่นยา
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <SprayingWidget plot="suan_ban" />
-            </div>
+        {/* Spraying Section */}
+        <div className="mb-8">
+          <h2 className="text-lg font-semibold text-neutral-800 mb-4">
+            🧪 การพ่นยา
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <SprayingWidget plot="suan_ban" />
           </div>
         </div>
 
-        {/* Coming Soon Sections */}
-        <div className="space-y-8">
-          {/* Spraying Section */}
-          <div>
-            <h2 className="text-lg font-semibold text-neutral-800 mb-4">
-              🎯 การพ่นยา
-            </h2>
-            <div className="bg-white rounded-lg shadow-md p-6 text-center text-neutral-500">
-              <p>Coming soon...</p>
-            </div>
+        {/* Fertilizing Section */}
+        <div className="mb-8">
+          <h2 className="text-lg font-semibold text-neutral-800 mb-4">
+            🌱 การใส่ปุ๋ย
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <FertilizingWidget plot="suan_ban" />
           </div>
+        </div>
 
-          {/* Fertilizing Section */}
-          <div>
-            <h2 className="text-lg font-semibold text-neutral-800 mb-4">
-              🌱 การใส่ปุ๋ย
-            </h2>
-            <div className="bg-white rounded-lg shadow-md p-6 text-center text-neutral-500">
-              <p>Coming soon...</p>
-            </div>
-          </div>
-
-          {/* Spray Decision Section */}
-          <div>
-            <h2 className="text-lg font-semibold text-neutral-800 mb-4">
-              🤔 วันนี้พ่นยาได้ไหม?
-            </h2>
-            <div className="bg-white rounded-lg shadow-md p-6 text-center text-neutral-500">
-              <p>Coming soon...</p>
-            </div>
+        {/* Coming Soon: Spray Decision */}
+        <div>
+          <h2 className="text-lg font-semibold text-neutral-800 mb-4">
+            🤔 วันนี้พ่นยาได้ไหม?
+          </h2>
+          <div className="bg-white rounded-lg shadow-md p-6 text-center text-neutral-500">
+            <p>Coming soon...</p>
           </div>
         </div>
       </div>
