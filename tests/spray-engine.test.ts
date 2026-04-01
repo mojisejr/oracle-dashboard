@@ -7,11 +7,12 @@ describe('Spray Decision Engine', () => {
     id: '1',
     location_id: 'suan-ban',
     forecast_date: '2026-03-30',
-    temp_min: 24,
-    temp_max: 30,
+    tc_min: 24,
+    tc_max: 30,
     rain_mm: 0,
-    wind_speed: 8,
-    humidity: 65,
+    rh_percent: 65,
+    swdown: 380,
+    provider: 'tmd',
     created_at: '2026-03-29T00:00:00Z',
   }
 
@@ -36,7 +37,6 @@ describe('Spray Decision Engine', () => {
       expect(decision.reasons).toHaveLength(0)
       expect(decision.recommendations).toContain('สภาพอากาศเหมาะสม พร้อมพ่นยาได้!')
       expect(decision.weather_check.rain).toBe(false)
-      expect(decision.weather_check.wind).toBe(false)
       expect(decision.weather_check.temperature).toBe('ok')
       expect(decision.interval_check.status).toBe('ok')
     })
@@ -67,21 +67,8 @@ describe('Spray Decision Engine', () => {
       expect(decision.weather_check.rain).toBe(true)
     })
 
-    it('should block spray if wind > 15 km/h', () => {
-      const windyWeather = { ...mockWeather, wind_speed: 20 }
-      const decision = evaluateSprayDecision({
-        lastSpray: null,
-        todayWeather: windyWeather,
-        futureWeather: [],
-      })
-
-      expect(decision.canSpray).toBe(false)
-      expect(decision.reasons).toContainEqual(expect.stringContaining('ลมแรง'))
-      expect(decision.weather_check.wind).toBe(true)
-    })
-
     it('should warn if temperature > 32°C but still allow spray', () => {
-      const hotWeather = { ...mockWeather, temp_max: 35 }
+      const hotWeather = { ...mockWeather, tc_max: 35 }
       const decision = evaluateSprayDecision({
         lastSpray: { ...mockLastSpray, activity_date: '2026-03-20T07:00:00Z' }, // 10 days ago
         todayWeather: hotWeather,
@@ -121,7 +108,7 @@ describe('Spray Decision Engine', () => {
     })
 
     it('should handle multiple blocking conditions', () => {
-      const badWeather = { ...mockWeather, rain_mm: 10, wind_speed: 20 }
+      const badWeather = { ...mockWeather, rain_mm: 10, tc_max: 38 }
       const decision = evaluateSprayDecision({
         lastSpray: mockLastSpray, // 5 days ago
         todayWeather: badWeather,
@@ -131,20 +118,19 @@ describe('Spray Decision Engine', () => {
       expect(decision.canSpray).toBe(false)
       expect(decision.reasons.length).toBeGreaterThan(1)
       expect(decision.weather_check.rain).toBe(true)
-      expect(decision.weather_check.wind).toBe(true)
       expect(decision.interval_check.status).toBe('due_soon')
     })
   })
 
   describe('findNextDryDay', () => {
     const mockFutureWeather: WeatherForecast[] = [
-      { ...mockWeather, forecast_date: '2026-03-31', rain_mm: 10, wind_speed: 5 },
-      { ...mockWeather, forecast_date: '2026-04-01', rain_mm: 0, wind_speed: 8 },
-      { ...mockWeather, forecast_date: '2026-04-02', rain_mm: 5, wind_speed: 20 },
-      { ...mockWeather, forecast_date: '2026-04-03', rain_mm: 0, wind_speed: 10 },
+      { ...mockWeather, forecast_date: '2026-03-31', rain_mm: 10, swdown: 380 },
+      { ...mockWeather, forecast_date: '2026-04-01', rain_mm: 0, swdown: 400 },
+      { ...mockWeather, forecast_date: '2026-04-02', rain_mm: 5, swdown: 350 },
+      { ...mockWeather, forecast_date: '2026-04-03', rain_mm: 0, swdown: 380 },
     ]
 
-    it('should find first day with no rain and low wind', () => {
+    it('should find first day with no rain and good conditions', () => {
       const dryDay = findNextDryDay(mockFutureWeather)
       expect(dryDay).toBe('2026-04-01')
     })
@@ -155,9 +141,9 @@ describe('Spray Decision Engine', () => {
       expect(dryDay).toBe(null)
     })
 
-    it('should accept day with rain <= 5mm and wind <= 15 km/h', () => {
+    it('should accept day with rain <= 5mm', () => {
       const acceptable = [
-        { ...mockWeather, forecast_date: '2026-04-01', rain_mm: 5, wind_speed: 15 },
+        { ...mockWeather, forecast_date: '2026-04-01', rain_mm: 5, swdown: 380 },
       ]
       const dryDay = findNextDryDay(acceptable)
       expect(dryDay).toBe('2026-04-01')
