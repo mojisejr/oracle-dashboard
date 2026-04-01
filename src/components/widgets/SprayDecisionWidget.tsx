@@ -9,10 +9,11 @@ interface SprayDecision {
   weather: {
     date: string
     rain_mm: number
-    wind_speed_kmh: number
+    wind_speed_kmh: number | null
     temp_max: number
     temp_min: number
     humidity_percent: number
+    solar_radiation?: number
   }
 }
 
@@ -106,6 +107,9 @@ export function SprayDecisionWidget() {
           </div>
           <div>
             💧 ความชื้น: {data.weather.humidity_percent}%
+          </div>
+          <div>
+            ☀️ แสง: {data.weather.solar_radiation ? `${Math.round(data.weather.solar_radiation)} W/m²` : 'ไม่มีข้อมูล'}
           </div>
         </div>
       </div>
