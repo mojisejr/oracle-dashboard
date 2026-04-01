@@ -123,18 +123,23 @@ export async function getLastSpraying(): Promise<OrchardActivity | null> {
 
 /**
  * Get latest activity for a specific plot and type
+ *
+ * Schema: activity_logs table
+ * - plot_name: string (suan_ban, suan_lang, etc.)
+ * - activity_type: string (watering, spraying, fertilizing)
+ * - created_at: timestamp (use instead of activity_date)
  */
 export async function getLatestActivity(
   plot: string,
   type: 'watering' | 'spraying' | 'fertilizing' | 'harvesting' | 'pruning' | 'observation'
 ): Promise<OrchardActivity | null> {
   const { data, error } = await supabase
-    .from('orchard_activities')
+    .from('activity_logs')           // ← Fixed: Use activity_logs (has data)
     .select('*')
     .eq('plot_name', plot)
     .eq('activity_type', type)
     .is('deleted_at', null)
-    .order('activity_date', { ascending: false })
+    .order('created_at', { ascending: false })  // ← Fixed: Use created_at (not activity_date)
     .limit(1)
     .single()
 
@@ -142,7 +147,11 @@ export async function getLatestActivity(
     return null
   }
 
-  return data
+  // Map created_at → activity_date for API consistency
+  return {
+    ...data,
+    activity_date: data.created_at  // ← Map field for API response
+  }
 }
 
 /**
