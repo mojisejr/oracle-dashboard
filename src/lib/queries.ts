@@ -128,22 +128,24 @@ export async function getLastSpraying(): Promise<OrchardActivity | null> {
  * - plot_name: string (suan_ban, suan_lang, etc.)
  * - activity_type: string (watering, spraying, fertilizing)
  * - created_at: timestamp (use instead of activity_date)
+ * - NO deleted_at field (not soft-delete enabled)
  */
 export async function getLatestActivity(
   plot: string,
   type: 'watering' | 'spraying' | 'fertilizing' | 'harvesting' | 'pruning' | 'observation'
 ): Promise<OrchardActivity | null> {
   const { data, error } = await supabase
-    .from('activity_logs')           // ← Fixed: Use activity_logs (has data)
+    .from('activity_logs')           // ← Use activity_logs (has data)
     .select('*')
     .eq('plot_name', plot)
     .eq('activity_type', type)
-    .is('deleted_at', null)
-    .order('created_at', { ascending: false })  // ← Fixed: Use created_at (not activity_date)
+    // ← REMOVED: .is('deleted_at', null) - field doesn't exist in activity_logs
+    .order('created_at', { ascending: false })  // ← Use created_at (not activity_date)
     .limit(1)
     .single()
 
   if (error || !data) {
+    console.error('getLatestActivity error:', error)
     return null
   }
 
