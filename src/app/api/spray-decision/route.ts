@@ -8,7 +8,7 @@ import { getTodayWeather } from '@/lib/queries'
  * - Rain >20mm → Wait (chemical wash-off risk)
  * - Temp >32°C → Wait (chemical volatilization)
  * 
- * Note: Wind speed not available in current weather_forecasts schema
+ * Note: Wind speed not available in TMD weather provider
  * 
  * Response:
  * - ok: All conditions favorable
@@ -26,15 +26,16 @@ export async function GET() {
       )
     }
 
-    // Cast to any to access DB-specific fields (tc_max, tc_min, rh_percent)
+    // Extract DB fields (actual schema: tc_max, tc_min, rh_percent, swdown)
     const weather = weatherData as any
     const reasons: string[] = []
     let decision: 'ok' | 'caution' | 'wait' = 'ok'
 
-    // Extract temperature from DB fields
-    const tempMax = weather.tc_max || weather.temp_max || 0
-    const tempMin = weather.tc_min || weather.temp_min || 0
-    const humidity = weather.rh_percent || weather.humidity_percent || 0
+    // Extract values from actual DB columns
+    const tempMax = weather.tc_max || 0
+    const tempMin = weather.tc_min || 0
+    const humidity = weather.rh_percent || 0
+    const solarRadiation = weather.swdown || 0
 
     // Check rain (mm)
     if (weather.rain_mm > 20) {
@@ -65,10 +66,11 @@ export async function GET() {
       weather: {
         date: weather.forecast_date,
         rain_mm: weather.rain_mm || 0,
-        wind_speed_kmh: null, // Not available in current schema
+        wind_speed_kmh: null, // Not available in TMD provider
         temp_max: tempMax,
         temp_min: tempMin,
         humidity_percent: humidity,
+        solar_radiation: solarRadiation, // W/m² (surface downwelling shortwave radiation)
       }
     })
   } catch (error) {

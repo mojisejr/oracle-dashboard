@@ -7,12 +7,15 @@ export interface WeatherForecast {
   id: string
   location_id: string
   forecast_date: string
-  temp_min: number
-  temp_max: number
+  tc_min: number
+  tc_max: number
   rain_mm: number
-  wind_speed: number
-  humidity: number
+  rh_percent: number
+  swdown: number
+  provider?: string
   created_at: string
+  fetched_at?: string
+  ingested_at?: string
 }
 
 export interface OrchardActivity {
