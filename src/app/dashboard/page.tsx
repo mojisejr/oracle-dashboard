@@ -1,6 +1,7 @@
 import { WateringWidget } from '@/components/widgets/WateringWidget'
 import { SprayingWidget } from '@/components/widgets/SprayingWidget'
 import { FertilizingWidget } from '@/components/widgets/FertilizingWidget'
+import { SprayDecisionWidget } from '@/components/widgets/SprayDecisionWidget'
 
 export default function DashboardPage() {
   return (
@@ -49,13 +50,13 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Coming Soon: Spray Decision */}
+        {/* Spray Decision */}
         <div>
           <h2 className="text-lg font-semibold text-neutral-800 mb-4">
             🤔 วันนี้พ่นยาได้ไหม?
           </h2>
-          <div className="bg-white rounded-lg shadow-md p-6 text-center text-neutral-500">
-            <p>Coming soon...</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <SprayDecisionWidget />
           </div>
         </div>
       </div>
