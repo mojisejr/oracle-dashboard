@@ -59,6 +59,7 @@ export async function getLatestActivities(): Promise<LatestActivities> {
 
 /**
  * Get today's weather forecast for default location (suan-ban)
+ * Note: Multiple forecasts may exist for same day, so use .limit(1) instead of .single()
  */
 export async function getTodayWeather(): Promise<WeatherForecast | null> {
   const today = new Date().toISOString().split('T')[0]
@@ -68,13 +69,15 @@ export async function getTodayWeather(): Promise<WeatherForecast | null> {
     .select('*')
     .eq('forecast_date', today)
     .eq('location_id', 'suan-ban')
-    .single()
+    .limit(1)  // ← Changed from .single()
 
-  if (error || !data) {
+  if (error || !data || data.length === 0) {
+    console.error('getTodayWeather error:', error)
     return null
   }
 
-  return data
+  // Return first record if multiple exist
+  return data[0]
 }
 
 /**
