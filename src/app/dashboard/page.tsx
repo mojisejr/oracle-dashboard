@@ -1,4 +1,5 @@
 import { WateringWidget } from '@/components/widgets/WateringWidget'
+import { SprayingWidget } from '@/components/widgets/SprayingWidget'
 
 export default function DashboardPage() {
   return (
@@ -24,7 +25,16 @@ export default function DashboardPage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <WateringWidget plot="suan_ban" />
-            {/* More watering widgets will be added here */}
+          </div>
+
+          {/* Spraying Section */}
+          <div className="mt-8">
+            <h2 className="text-lg font-semibold text-neutral-800 mb-4">
+              🧪 การพ่นยา
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <SprayingWidget plot="suan_ban" />
+            </div>
           </div>
         </div>
 
