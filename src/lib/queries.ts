@@ -82,6 +82,9 @@ export async function getTodayWeather(): Promise<WeatherForecast | null> {
 
 /**
  * Get weather forecast for next N days (including today)
+ *
+ * Note: Multiple records may exist for the same day (duplicates),
+ * so we deduplicate to ensure 1 record per day.
  */
 export async function getWeatherForecast(days: number = 7): Promise<WeatherForecast[]> {
   const today = new Date().toISOString().split('T')[0]
@@ -101,7 +104,18 @@ export async function getWeatherForecast(days: number = 7): Promise<WeatherForec
     return []
   }
 
-  return data
+  // Deduplicate: Keep first record for each date
+  const uniqueByDate = new Map<string, WeatherForecast>()
+  for (const record of data) {
+    if (!uniqueByDate.has(record.forecast_date)) {
+      uniqueByDate.set(record.forecast_date, record)
+    }
+  }
+
+  // Convert map back to array and sort by date
+  return Array.from(uniqueByDate.values()).sort((a, b) =>
+    a.forecast_date.localeCompare(b.forecast_date)
+  )
 }
 
 /**
