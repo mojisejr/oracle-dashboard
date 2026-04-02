@@ -7,7 +7,15 @@ import type { WeatherTrends, WeatherPeaks, WeatherRelationships } from '@/lib/we
 
 interface WeatherData {
   location: string
-  forecast: WeatherForecast[]
+  forecast: Array<{
+    date: string
+    temp_max: number
+    temp_min: number
+    rain_mm: number
+    humidity_percent: number
+    solar_radiation: number
+    location: string
+  }>
 }
 
 export function WeatherReportWidget() {
@@ -57,9 +65,23 @@ export function WeatherReportWidget() {
     )
   }
 
+  // Transform API response to match weather-analysis types
+  const normalizedForecast: WeatherForecast[] = data.forecast.map(day => ({
+    id: '',
+    location_id: day.location || 'suan-ban',
+    forecast_date: day.date,
+    tc_min: day.temp_min || 0,
+    tc_max: day.temp_max || 0,
+    rain_mm: day.rain_mm || 0,
+    rh_percent: day.humidity_percent || 0,
+    swdown: day.solar_radiation || 0,
+    provider: 'tmd',
+    created_at: '',
+  }))
+
   // Calculate analysis (script returns raw data)
-  const trends = calculateTrends(data.forecast)
-  const peaks = findPeaks(data.forecast)
+  const trends = calculateTrends(normalizedForecast)
+  const peaks = findPeaks(normalizedForecast)
   const relationships = identifyRelationships(trends, peaks)
 
   // Agent generates insights (reasoning layer)
@@ -145,13 +167,13 @@ export function WeatherReportWidget() {
                 className="flex-shrink-0 w-24 bg-gray-50 rounded-lg p-3 text-center"
               >
                 <div className="text-xs font-semibold text-gray-900 mb-1">
-                  {formatShortDate(day.forecast_date)}
+                  {formatShortDate(day.date)}
                 </div>
                 <div className="text-2xl mb-1">
-                  {getWeatherIcon(day.rain_mm, day.swdown)}
+                  {getWeatherIcon(day.rain_mm, day.solar_radiation)}
                 </div>
                 <div className="text-sm font-bold text-gray-900">
-                  {day.tc_max.toFixed(0)}°
+                  {day.temp_max.toFixed(0)}°
                 </div>
                 <div className="text-xs text-gray-600">
                   {day.rain_mm.toFixed(0)}mm
@@ -231,6 +253,6 @@ function getTrendColor(trend: string): string {
 function getWeatherIcon(rainMm: number, solarRadiation: number): string {
   if (rainMm > 10) return '🌧️'
   if (rainMm > 5) return '🌦️'
-  if (solarRadiation > 400) return '☀️'
+  if (solarRadiation && solarRadiation > 400) return '☀️'
   return '⛅'
 }
