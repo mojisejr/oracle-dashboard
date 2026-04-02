@@ -70,11 +70,11 @@ export function WeatherReportWidget() {
     id: '',
     location_id: day.location || 'suan-ban',
     forecast_date: day.date,
-    tc_min: day.temp_min || 0,
-    tc_max: day.temp_max || 0,
-    rain_mm: day.rain_mm || 0,
-    rh_percent: day.humidity_percent || 0,
-    swdown: day.solar_radiation || 0,
+    tc_min: day.temp_min ?? 0,
+    tc_max: day.temp_max ?? 0,
+    rain_mm: day.rain_mm ?? 0,
+    rh_percent: day.humidity_percent ?? 0,
+    swdown: day.solar_radiation ?? 0,
     provider: 'tmd',
     created_at: '',
   }))
@@ -102,22 +102,22 @@ export function WeatherReportWidget() {
           <div className="flex items-center gap-2">
             <span>🌡️ อุณหภูมิ:</span>
             <span className={getTrendColor(trends.temperature.trend)}>
-              {trends.temperature.avgMin.toFixed(0)}-{trends.temperature.avgMax.toFixed(0)}°C
-              {trends.temperature.delta > 0 && ` → ร้อนขึ้น ${trends.temperature.delta.toFixed(0)}°C`}
-              {trends.temperature.delta < 0 && ` → เย็นลง ${Math.abs(trends.temperature.delta).toFixed(0)}°C`}
+              {(trends.temperature.avgMin ?? 0).toFixed(0)}-{(trends.temperature.avgMax ?? 0).toFixed(0)}°C
+              {trends.temperature.delta > 0 && ` → ร้อนขึ้น ${(trends.temperature.delta ?? 0).toFixed(0)}°C`}
+              {trends.temperature.delta < 0 && ` → เย็นลง ${Math.abs(trends.temperature.delta ?? 0).toFixed(0)}°C`}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <span>🌧️ ฝน:</span>
             <span className={getTrendColor(trends.rainfall.trend)}>
-              {trends.rainfall.total.toFixed(0)}mm
+              {(trends.rainfall.total ?? 0).toFixed(0)}mm
               {trends.rainfall.dryDays === 7 && ' (ไม่มีฝน 7 วัน)'}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <span>💧 ความชื้น:</span>
             <span className={getTrendColor(trends.humidity.trend)}>
-              {trends.humidity.avg.toFixed(0)}%
+              {(trends.humidity.avg ?? 0).toFixed(0)}%
               {trends.humidity.delta > 0 && ' → ชื้นขึ้น'}
               {trends.humidity.delta < 0 && ' → แห้งลง'}
             </span>
@@ -125,7 +125,7 @@ export function WeatherReportWidget() {
           <div className="flex items-center gap-2">
             <span>☀️ แสง:</span>
             <span className={getTrendColor(trends.light.trend)}>
-              {trends.light.avg.toFixed(0)} W/m²
+              {(trends.light.avg ?? 0).toFixed(0)} W/m²
               {trends.light.delta > 0 && ' → แรงขึ้น'}
               {trends.light.delta < 0 && ' → อ่อนลง'}
             </span>
@@ -137,11 +137,11 @@ export function WeatherReportWidget() {
       <div className="space-y-2">
         <div className="text-sm font-semibold text-gray-900">📈 จุดสังเกต</div>
         <div className="grid grid-cols-2 gap-2 text-sm text-gray-700">
-          <div>• ชื้นสุด: {formatShortDate(peaks.mostHumidDay.date)} ({peaks.mostHumidDay.humidity.toFixed(0)}%)</div>
-          <div>• แสงเยอะสุด: {formatShortDate(peaks.brightestDay.date)} ({peaks.brightestDay.light.toFixed(0)} W/m²)</div>
-          <div>• ร้อนสุด: {formatShortDate(peaks.hottestDay.date)} ({peaks.hottestDay.temp.toFixed(0)}°C)</div>
+          <div>• ชื้นสุด: {formatShortDate(peaks.mostHumidDay.date)} ({(peaks.mostHumidDay.humidity ?? 0).toFixed(0)}%)</div>
+          <div>• แสงเยอะสุด: {formatShortDate(peaks.brightestDay.date)} ({(peaks.brightestDay.light ?? 0).toFixed(0)} W/m²)</div>
+          <div>• ร้อนสุด: {formatShortDate(peaks.hottestDay.date)} ({(peaks.hottestDay.temp ?? 0).toFixed(0)}°C)</div>
           {peaks.rainiestDay.rain > 0 && (
-            <div>• ฝนเยอะสุด: {formatShortDate(peaks.rainiestDay.date)} ({peaks.rainiestDay.rain.toFixed(0)}mm)</div>
+            <div>• ฝนเยอะสุด: {formatShortDate(peaks.rainiestDay.date)} ({(peaks.rainiestDay.rain ?? 0).toFixed(0)}mm)</div>
           )}
         </div>
       </div>
@@ -170,13 +170,13 @@ export function WeatherReportWidget() {
                   {formatShortDate(day.date)}
                 </div>
                 <div className="text-2xl mb-1">
-                  {getWeatherIcon(day.rain_mm, day.solar_radiation)}
+                  {getWeatherIcon(day.rain_mm ?? 0, day.solar_radiation ?? 0)}
                 </div>
                 <div className="text-sm font-bold text-gray-900">
-                  {day.temp_max.toFixed(0)}°
+                  {(day.temp_max ?? 0).toFixed(0)}°
                 </div>
                 <div className="text-xs text-gray-600">
-                  {day.rain_mm.toFixed(0)}mm
+                  {(day.rain_mm ?? 0).toFixed(0)}mm
                 </div>
               </div>
             ))}
