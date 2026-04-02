@@ -1,16 +1,17 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import type { WeatherForecast } from '@/lib/types'
 import { getSprayDecision, getWateringDecision, getHeatStressWarning } from '@/lib/spray-engine'
-import type { SprayDecisionResult } from '@/lib/spray-engine'
+import type { SprayStatus } from '@/lib/spray-engine'
+import type { WeatherForecast } from '@/lib/types'
 
-interface WeatherWidgetMinimalProps {
-  location?: string // 'suan_ban' | 'suan_lang' | 'suan_makham'
+interface WeatherData {
+  location: string
+  forecast: WeatherForecast[]
 }
 
-export function WeatherWidgetMinimal({ location = 'suan_ban' }: WeatherWidgetMinimalProps) {
-  const [weather, setWeather] = useState<WeatherForecast | null>(null)
+export function WeatherWidgetMinimal() {
+  const [data, setData] = useState<WeatherData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [expanded, setExpanded] = useState(false)
@@ -22,19 +23,15 @@ export function WeatherWidgetMinimal({ location = 'suan_ban' }: WeatherWidgetMin
         return res.json()
       })
       .then(data => {
-        // Take first forecast (today)
-        if (data.forecast && data.forecast.length > 0) {
-          setWeather(data.forecast[0])
-        }
+        setData(data)
         setLoading(false)
       })
       .catch(err => {
         setError(err.message)
         setLoading(false)
       })
-  }, [location])
+  }, [])
 
-  // Loading state
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow-md p-4 animate-pulse">
@@ -44,69 +41,96 @@ export function WeatherWidgetMinimal({ location = 'suan_ban' }: WeatherWidgetMin
     )
   }
 
-  // Error state
   if (error) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <p className="text-red-700 text-sm">❌ {error}</p>
+        <p className="text-red-700">❌ {error}</p>
       </div>
     )
   }
 
-  // No data state
-  if (!weather) {
+  if (!data || !data.forecast || data.forecast.length === 0) {
     return (
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-        <p className="text-gray-600 text-sm">📊 ไม่พบข้อมูลอากาศ</p>
+        <p className="text-gray-700">📊 ไม่มีข้อมูลอากาศ</p>
       </div>
     )
   }
 
-  // Get spray decision
-  const decision = getSprayDecision(weather)
-  const wateringAdvice = getWateringDecision(weather)
-  const heatWarning = getHeatStressWarning(weather.tc_max)
+  const today = data.forecast[0]
+  const decision = getSprayDecision(today)
+  const watering = getWateringDecision(today)
+  const heatWarning = getHeatStressWarning(today.tc_max)
 
   return (
-    <div
+    <div 
       className="bg-white rounded-lg shadow-md p-4 cursor-pointer transition-all hover:shadow-lg active:scale-98"
       onClick={() => setExpanded(!expanded)}
     >
       {/* Collapsed View (2 lines) */}
-      <HeroStatus decision={decision} />
-      <KeyNumbers weather={weather} />
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">{decision.icon}</span>
+          <span className={`text-lg font-bold ${getStatusColor(decision.status)}`}>
+            {decision.status === 'allowed' && 'พ่นยาได้'}
+            {decision.status === 'wait' && 'งดพ่นยา'}
+            {decision.status === 'caution' && 'รอดูสถานการณ์'}
+          </span>
+        </div>
+      </div>
+      
+      <div className="text-sm text-gray-600 flex gap-4">
+        <span>{today.tc_max}°C</span>
+        <span>{today.rain_mm}mm</span>
+        <span>{today.rh_percent}%</span>
+      </div>
 
       {/* Expanded View */}
       {expanded && (
         <div className="mt-4 pt-4 border-t border-gray-200 space-y-3">
+          {/* Decision Details */}
+          <div>
+            <div className="text-sm font-semibold text-gray-900 mb-1">💡 คำแนะนำ</div>
+            <p className="text-sm text-gray-700">{decision.reason}</p>
+          </div>
+
+          {/* Watering Advice */}
+          <div>
+            <div className="text-sm font-semibold text-gray-900 mb-1">💧 การรดน้ำ</div>
+            <p className="text-sm text-gray-700">
+              {watering.icon} {watering.action}
+            </p>
+          </div>
+
+          {/* Heat Warning */}
+          {heatWarning && (
+            <div>
+              <div className="text-sm font-semibold text-gray-900 mb-1">🌡️ คำเตือน</div>
+              <p className="text-sm text-red-600">{heatWarning}</p>
+            </div>
+          )}
+
           {/* Weather Details */}
           <div>
-            <h4 className="text-sm font-semibold text-gray-700 mb-2">📊 รายละเอียด</h4>
-            <div className="space-y-1 text-sm text-gray-600">
-              <div>• อุณหภูมิ: {weather.tc_min}–{weather.tc_max}°C</div>
-              <div>• ฝน: {weather.rain_mm}mm {weather.rain_mm === 0 ? '(ไม่มีฝน)' : ''}</div>
-              <div>• ความชื้น: {weather.rh_percent}% {weather.rh_percent > 85 ? '(สูง)' : weather.rh_percent < 60 ? '(ต่ำ)' : '(ปกติ)'}</div>
-              <div>• แสงแดด: {weather.swdown} W/m² {weather.swdown > 400 ? '(แรง)' : ''}</div>
+            <div className="text-sm font-semibold text-gray-900 mb-1">📊 รายละเอียด</div>
+            <div className="text-sm text-gray-700 space-y-1">
+              <div>• อุณหภูมิ: {today.tc_min}-{today.tc_max}°C</div>
+              <div>• ฝน: {today.rain_mm}mm {today.rain_mm === 0 && '(ไม่มีฝน)'}</div>
+              <div>• ความชื้น: {today.rh_percent}%</div>
+              <div>• แสงแดด: {today.swdown} W/m² {today.swdown > 400 && '(แรง)'}</div>
             </div>
           </div>
 
-          {/* Recommendations */}
-          <div>
-            <h4 className="text-sm font-semibold text-gray-700 mb-2">💡 คำแนะนำ</h4>
-            <div className="space-y-1 text-sm">
-              <div className={decision.status === 'allowed' ? 'text-green-700' : decision.status === 'wait' ? 'text-red-700' : 'text-yellow-700'}>
-                • {decision.reason}
-              </div>
-              <div className="text-gray-600">• {wateringAdvice.icon} {wateringAdvice.action}</div>
-              {heatWarning && <div className="text-red-700">• {heatWarning}</div>}
-            </div>
+          {/* Tap hint */}
+          <div className="text-xs text-gray-400 text-center mt-2">
+            แตะเพื่อย่อ
           </div>
         </div>
       )}
 
-      {/* Tap hint (only when collapsed) */}
+      {/* Tap hint (collapsed) */}
       {!expanded && (
-        <div className="mt-2 text-xs text-gray-400 text-center">
+        <div className="text-xs text-gray-400 text-center mt-2">
           แตะเพื่อดูรายละเอียด
         </div>
       )}
@@ -115,39 +139,17 @@ export function WeatherWidgetMinimal({ location = 'suan_ban' }: WeatherWidgetMin
 }
 
 /**
- * Hero Status Component (1 line)
- * Shows: ✅ พ่นยาได้ / ❌ งดพ่นยา / 🟠 รอดูสถานการณ์
+ * Get status color
  */
-function HeroStatus({ decision }: { decision: SprayDecisionResult }) {
-  const statusText = {
-    allowed: 'พ่นยาได้',
-    wait: 'งดพ่นยา',
-    caution: 'รอดูสถานการณ์',
+function getStatusColor(status: SprayStatus): string {
+  switch (status) {
+    case 'allowed':
+      return 'text-green-600'
+    case 'wait':
+      return 'text-red-600'
+    case 'caution':
+      return 'text-yellow-600'
+    default:
+      return 'text-gray-600'
   }
-
-  const statusColor = {
-    allowed: 'text-green-600',
-    wait: 'text-red-600',
-    caution: 'text-yellow-600',
-  }
-
-  return (
-    <div className={`text-xl font-bold ${statusColor[decision.status]}`}>
-      {decision.icon} {statusText[decision.status]}
-    </div>
-  )
-}
-
-/**
- * Key Numbers Component (1 line)
- * Shows: 36°C / 0mm / 65%
- */
-function KeyNumbers({ weather }: { weather: WeatherForecast }) {
-  return (
-    <div className="text-sm text-gray-600 flex gap-4 mt-2">
-      <span>{weather.tc_max}°C</span>
-      <span>{weather.rain_mm}mm</span>
-      <span>{weather.rh_percent}%</span>
-    </div>
-  )
 }

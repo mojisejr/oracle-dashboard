@@ -67,7 +67,7 @@ export default function DashboardPage() {
             🌤️ อากาศวันนี้
           </h2>
           <div className="grid grid-cols-1 gap-6">
-            <WeatherWidgetMinimal location="suan_ban" />
+            <WeatherWidgetMinimal />
           </div>
         </div>
       </div>
