@@ -2,7 +2,7 @@ import { WateringWidget } from '@/components/widgets/WateringWidget'
 import { SprayingWidget } from '@/components/widgets/SprayingWidget'
 import { FertilizingWidget } from '@/components/widgets/FertilizingWidget'
 import { SprayDecisionWidget } from '@/components/widgets/SprayDecisionWidget'
-import { WeatherWidgetMinimal } from '@/components/widgets/WeatherWidgetMinimal'
+import { WeatherReportWidget } from '@/components/widgets/WeatherReportWidget'
 
 export default function DashboardPage() {
   return (
@@ -61,13 +61,13 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Weather Forecast */}
+        {/* Weather Report */}
         <div className="mb-8">
           <h2 className="text-lg font-semibold text-neutral-800 mb-4">
-            🌤️ อากาศวันนี้
+            🌤️ สรุปอากาศ 7 วัน
           </h2>
           <div className="grid grid-cols-1 gap-6">
-            <WeatherWidgetMinimal />
+            <WeatherReportWidget />
           </div>
         </div>
       </div>
