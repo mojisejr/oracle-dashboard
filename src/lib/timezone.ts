@@ -1,6 +1,6 @@
 /**
  * Timezone utilities for Oracle Dashboard
- * 
+ *
  * Ensures all date operations use Asia/Bangkok timezone
  * Mirrors logic from skills/_shared-orchard/scripts/lib/timezone.js
  */
@@ -44,17 +44,30 @@ export function getNow(timezone: string = DEFAULT_TIMEZONE): Date {
 
 /**
  * Calculate days since a given date (timezone-aware)
+ *
+ * Simple approach: Parse both dates as midnight in the same timezone
+ * Using YYYY-MM-DD format ensures consistent parsing
  */
 export function getDaysSince(date: string, timezone: string = DEFAULT_TIMEZONE): number {
-  const now = getNow(timezone)
-  const target = new Date(date)
-  const diffTime = now.getTime() - target.getTime()
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+  const today = getToday(timezone) // "2026-04-03" (Asia/Bangkok)
+  const targetDate = date // "2026-04-02"
+
+  // Parse both dates as midnight in the same timezone
+  const todayDate = new Date(`${today}T00:00:00`)
+  const targetDateObj = new Date(`${targetDate}T00:00:00`)
+
+  // Calculate difference in milliseconds
+  const diffMs = todayDate.getTime() - targetDateObj.getTime()
+
+  // Convert to days
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+
   return diffDays
 }
 
 /**
  * Format date to Thai locale (timezone-aware)
+ * Alias: formatDateThai for backward compatibility
  */
 export function formatDateThai(date: string, timezone: string = DEFAULT_TIMEZONE): string {
   if (!isValidTimezone(timezone)) {
