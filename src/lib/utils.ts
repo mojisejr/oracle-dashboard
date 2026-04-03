@@ -1,27 +1,14 @@
 /**
- * Calculate days since a given date
- * @param date - Date string or @returns Number of days
+ * Utility functions for Oracle Dashboard
+ * 
+ * All date operations use Asia/Bangkok timezone by default
+ * Re-exports from timezone.ts for backward compatibility
  */
-export function getDaysSince(date: string): number {
-  const now = new Date()
-  const target = new Date(date)
-  const diffTime = now.getTime() - target.getTime()
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-  return diffDays
-}
 
-/**
- * Format date to Thai locale
- * @param date - Date string | @returns Formatted date string
- */
-export function formatDateThai(date: string): string {
-  const d = new Date(date)
-  return d.toLocaleDateString('th-TH', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  })
-}
+// Re-export timezone-aware functions
+export { getDaysSince, formatDateThai, getToday, formatDateShort } from './timezone'
+
+// Keep formatPlotName here (not timezone-related)
 
 /**
  * Format plot name for display
