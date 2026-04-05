@@ -81,7 +81,8 @@ export async function getTodayWeather(
 /**
  * Get weather forecast for next N days (including today)
  *
- * Note: Multiple records may exist for the same day (duplicates),
+ * Note: If no data for today, returns latest available forecasts
+ * Multiple records may exist for the same day (duplicates),
  * so we deduplicate to ensure 1 record per day.
  */
 export async function getWeatherForecast(
@@ -93,7 +94,8 @@ export async function getWeatherForecast(
   endDate.setDate(endDate.getDate() + days)
   const endDateStr = endDate.toISOString().split('T')[0]
 
-  const { data, error } = await supabase
+  // Try to get forecasts from today onwards
+  let { data, error } = await supabase
     .from('weather_forecasts')
     .select('*')
     .gte('forecast_date', today)
@@ -101,8 +103,27 @@ export async function getWeatherForecast(
     .eq('location_id', location)
     .order('forecast_date', { ascending: true })
 
-  if (error || !data) {
+  if (error) {
+    console.error('getWeatherForecast error:', error)
     return []
+  }
+
+  // Fallback: If no data from today, get latest available forecasts
+  if (!data || data.length === 0) {
+    console.warn(`No weather forecast from ${today}, falling back to latest available`)
+    
+    const { data: latestData, error: latestError } = await supabase
+      .from('weather_forecasts')
+      .select('*')
+      .eq('location_id', location)
+      .order('forecast_date', { ascending: false })
+      .limit(days)
+
+    if (latestError || !latestData) {
+      return []
+    }
+
+    data = latestData.reverse() // Reverse to get chronological order
   }
 
   // Deduplicate: Keep first record for each date

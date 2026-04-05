@@ -45,12 +45,15 @@ export function getNow(timezone: string = DEFAULT_TIMEZONE): Date {
 /**
  * Calculate days since a given date (timezone-aware)
  *
- * Simple approach: Parse both dates as midnight in the same timezone
- * Using YYYY-MM-DD format ensures consistent parsing
+ * Supports both:
+ * - YYYY-MM-DD format: "2026-04-03"
+ * - ISO string with time: "2026-04-03T01:00:00"
  */
 export function getDaysSince(date: string, timezone: string = DEFAULT_TIMEZONE): number {
-  const today = getToday(timezone) // "2026-04-03" (Asia/Bangkok)
-  const targetDate = date // "2026-04-02"
+  const today = getToday(timezone) // "2026-04-05" (Asia/Bangkok)
+
+  // Extract date part only (remove time if present)
+  const targetDate = date.split('T')[0] // "2026-04-03" from "2026-04-03T01:00:00"
 
   // Parse both dates as midnight in the same timezone
   const todayDate = new Date(`${today}T00:00:00`)
