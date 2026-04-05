@@ -55,23 +55,42 @@ export async function getLatestActivities(): Promise<LatestActivities> {
 
 /**
  * Get today's weather forecast for a specific location
- * Note: Multiple forecasts may exist for same day, so use .limit(1) instead of .single()
+ * Note: Falls back to latest forecast if today's data not available
+ * @param location - Plot name (supports both underscore and hyphen format)
  */
 export async function getTodayWeather(
   location: string = 'suan_ban'
 ): Promise<WeatherForecast | null> {
   const today = new Date().toISOString().split('T')[0]
+  
+  // Convert underscore to hyphen (database uses hyphen format)
+  const dbLocation = location.replace(/_/g, '-')
 
   const { data, error } = await supabase
     .from('weather_forecasts')
     .select('*')
     .eq('forecast_date', today)
-    .eq('location_id', location)
+    .eq('location_id', dbLocation)
     .limit(1)
 
   if (error || !data || data.length === 0) {
     console.error('getTodayWeather error:', error)
-    return null
+    
+    // Fallback: Get latest available forecast
+    console.warn(`No weather forecast for ${today}, falling back to latest`)
+    const { data: latestData, error: latestError } = await supabase
+      .from('weather_forecasts')
+      .select('*')
+      .eq('location_id', dbLocation)
+      .order('forecast_date', { ascending: false })
+      .limit(1)
+
+    if (latestError || !latestData || latestData.length === 0) {
+      console.error('getTodayWeather fallback error:', latestError)
+      return null
+    }
+
+    return latestData[0]
   }
 
   // Return first record if multiple exist
@@ -84,6 +103,9 @@ export async function getTodayWeather(
  * Note: If no data for today, returns latest available forecasts
  * Multiple records may exist for the same day (duplicates),
  * so we deduplicate to ensure 1 record per day.
+ * 
+ * @param days - Number of days to fetch
+ * @param location - Plot name (supports both underscore and hyphen format)
  */
 export async function getWeatherForecast(
   days: number = 7,
@@ -93,6 +115,9 @@ export async function getWeatherForecast(
   const endDate = new Date()
   endDate.setDate(endDate.getDate() + days)
   const endDateStr = endDate.toISOString().split('T')[0]
+  
+  // Convert underscore to hyphen (database uses hyphen format)
+  const dbLocation = location.replace(/_/g, '-')
 
   // Try to get forecasts from today onwards
   let { data, error } = await supabase
@@ -100,7 +125,7 @@ export async function getWeatherForecast(
     .select('*')
     .gte('forecast_date', today)
     .lte('forecast_date', endDateStr)
-    .eq('location_id', location)
+    .eq('location_id', dbLocation)
     .order('forecast_date', { ascending: true })
 
   if (error) {
@@ -115,7 +140,7 @@ export async function getWeatherForecast(
     const { data: latestData, error: latestError } = await supabase
       .from('weather_forecasts')
       .select('*')
-      .eq('location_id', location)
+      .eq('location_id', dbLocation)
       .order('forecast_date', { ascending: false })
       .limit(days)
 
@@ -142,9 +167,12 @@ export async function getWeatherForecast(
 
 /**
  * Get last spraying activity for a specific plot
- * @param plot - Optional plot filter
+ * @param plot - Optional plot filter (supports both underscore and hyphen format)
  */
 export async function getLastSpraying(plot?: string): Promise<OrchardActivity | null> {
+  // Convert underscore to hyphen (database uses hyphen format)
+  const dbPlot = plot ? plot.replace(/_/g, '-') : undefined
+  
   let query = supabase
     .from('activity_logs')
     .select('*')
@@ -152,8 +180,8 @@ export async function getLastSpraying(plot?: string): Promise<OrchardActivity | 
     .order('activity_date', { ascending: false })
     .limit(1)
 
-  if (plot) {
-    query = query.eq('plot_name', plot)
+  if (dbPlot) {
+    query = query.eq('plot_name', dbPlot)
   }
 
   const { data, error } = await query.single()
