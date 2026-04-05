@@ -2,6 +2,23 @@ import { supabase } from './supabase'
 import type { OrchardActivity, WeatherForecast, LatestActivities } from './types'
 
 /**
+ * Get active cases
+ */
+export async function getActiveCases(): Promise<any[]> {
+  const { data, error } = await supabase
+    .from('cases')
+    .select('*')
+    .eq('status', 'active')
+    .order('observed_date', { ascending: false })
+
+  if (error) {
+    return []
+  }
+
+  return data || []
+}
+
+/**
  * Get latest activities by type (watering, spraying, fertilizing)
  */
 export async function getLatestActivities(): Promise<LatestActivities> {

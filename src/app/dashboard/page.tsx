@@ -6,7 +6,12 @@ import { SprayingWidget } from '@/components/widgets/SprayingWidget'
 import { FertilizingWidget } from '@/components/widgets/FertilizingWidget'
 import { SprayDecisionWidget } from '@/components/widgets/SprayDecisionWidget'
 import { WeatherReportWidget } from '@/components/widgets/WeatherReportWidget'
-import { formatPlotName } from '@/lib/utils'
+import { AlertCardsWidget } from '@/components/widgets/AlertCardsWidget'
+import { UpcomingTasksWidget } from '@/components/widgets/UpcomingTasksWidget'
+import { CaseTimelineWidget } from '@/components/widgets/CaseTimelineWidget'
+import { PharmacyWidget } from '@/components/widgets/PharmacyWidget'
+import { ActivityHistoryWidget } from '@/components/widgets/ActivityHistoryWidget'
+import { AnalyticsWidget } from '@/components/widgets/AnalyticsWidget'
 
 const PLOTS = [
   { id: 'suan_ban', name: 'สวนบ้าน' },
@@ -57,11 +62,27 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        {/* Current Plot Indicator */}
-        <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-sm text-blue-800">
-            📍 กำลังดูข้อมูล: <strong>{formatPlotName(selectedPlot)}</strong>
-          </p>
+        {/* NEW: Alert Cards (Sticky) */}
+        <div className="sticky top-0 z-10 bg-white shadow-md mb-4">
+          <AlertCardsWidget />
+        </div>
+
+        {/* NEW: Upcoming Tasks */}
+        <div className="mb-6">
+          <UpcomingTasksWidget />
+        </div>
+
+        {/* NEW: Case Timeline */}
+        <div className="mb-6">
+          <CaseTimelineWidget />
+        </div>
+
+        {/* Separator */}
+        <hr className="my-8 border-t-2 border-gray-200" />
+        <div className="text-center">
+          <span className="text-sm font-medium text-gray-500">
+            ━━━━ Current Activities ━━━━
+          </span>
         </div>
 
         {/* Watering Section */}
@@ -112,6 +133,29 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 gap-6">
             <WeatherReportWidget location={selectedPlot} />
           </div>
+        </div>
+
+        {/* Separator */}
+        <hr className="my-8 border-t-2 border-gray-200" />
+        <div className="text-center">
+          <span className="text-sm font-medium text-gray-500">
+            ━━━━ Intelligence & History ━━━
+          </span>
+        </div>
+
+        {/* NEW: Pharmacy */}
+        <div className="mb-6">
+          <PharmacyWidget />
+        </div>
+
+        {/* NEW: Activity History */}
+        <div className="mb-6">
+          <ActivityHistoryWidget />
+        </div>
+
+        {/* NEW: Analytics */}
+        <div className="mb-6">
+          <AnalyticsWidget />
         </div>
       </div>
     </div>
