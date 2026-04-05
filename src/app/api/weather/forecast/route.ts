@@ -3,23 +3,29 @@ import { getWeatherForecast } from '@/lib/queries'
 
 /**
  * Weather Forecast API
- * 
- * Returns 7-day weather forecast for default location (suan-ban)
- * 
+ *
+ * Returns 7-day weather forecast for specified location
+ *
+ * Query Parameters:
+ * - location: Plot location (default: suan_ban)
+ *
  * Available data (from TMD provider):
  * - Temperature: tc_max, tc_min (°C)
  * - Rain: rain_mm
  * - Humidity: rh_percent
  * - Solar Radiation: swdown (W/m²)
- * 
+ *
  * Not available:
  * - Wind speed/direction (not in TMD dataset)
  * - UV index
  * - Atmospheric pressure
  */
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const forecast = await getWeatherForecast(7)
+    const { searchParams } = new URL(request.url)
+    const location = searchParams.get('location') || 'suan_ban'
+
+    const forecast = await getWeatherForecast(7, location)
 
     if (!forecast || forecast.length === 0) {
       return NextResponse.json(
@@ -40,7 +46,7 @@ export async function GET() {
     }))
 
     return NextResponse.json({
-      location: 'suan-ban',
+      location: location,
       forecast: data,
       provider: 'tmd',
       generated_at: new Date().toISOString(),

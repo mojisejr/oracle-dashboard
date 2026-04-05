@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { formatDateThai } from '@/lib/utils'
+import { formatDateThai, formatPlotName } from '@/lib/utils'
 
 interface SprayDecision {
   decision: 'ok' | 'caution' | 'wait'
@@ -15,15 +15,24 @@ interface SprayDecision {
     humidity_percent: number
     solar_radiation?: number
   }
+  activity?: {
+    last_spray_date: string
+    days_since: number
+    plot: string
+  }
 }
 
-export function SprayDecisionWidget() {
+interface SprayDecisionWidgetProps {
+  plot?: string
+}
+
+export function SprayDecisionWidget({ plot = 'suan_ban' }: SprayDecisionWidgetProps) {
   const [data, setData] = useState<SprayDecision | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/spray-decision')
+    fetch(`/api/spray-decision?plot=${plot}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch spray decision')
         return res.json()
@@ -36,7 +45,7 @@ export function SprayDecisionWidget() {
         setError(err.message)
         setLoading(false)
       })
-  }, [])
+  }, [plot])
 
   if (loading) return <LoadingSkeleton />
   if (error) return <ErrorCard message={error} />
@@ -74,7 +83,7 @@ export function SprayDecisionWidget() {
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-lg font-semibold flex items-center gap-2">
           <span className="text-2xl">🧪</span>
-          <span>วันนี้พ่นยาได้ไหม?</span>
+          <span>วันนี้พ่นยาได้ไหม? - {formatPlotName(plot)}</span>
         </h3>
         <div className={`px-3 py-1 rounded-full ${config.textColor} font-semibold text-sm`}>
           {config.icon} {config.label}
@@ -89,6 +98,15 @@ export function SprayDecisionWidget() {
           </p>
         ))}
       </div>
+
+      {/* Activity Info */}
+      {data.activity && (
+        <div className="mb-3 p-2 bg-white/50 rounded border border-neutral-200">
+          <p className="text-xs text-neutral-600">
+            📅 พ่นยาล่าสุด: {formatDateThai(data.activity.last_spray_date)} ({data.activity.days_since} วันที่แล้ว)
+          </p>
+        </div>
+      )}
 
       {/* Weather Details */}
       <div className="mt-4 pt-3 border-t border-neutral-200">

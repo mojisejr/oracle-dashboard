@@ -18,13 +18,17 @@ interface WeatherData {
   }>
 }
 
-export function WeatherReportWidget() {
+interface WeatherReportWidgetProps {
+  location?: string
+}
+
+export function WeatherReportWidget({ location = 'suan_ban' }: WeatherReportWidgetProps) {
   const [data, setData] = useState<WeatherData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/weather/forecast')
+    fetch(`/api/weather/forecast?location=${location}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch weather forecast')
         return res.json()
@@ -37,7 +41,7 @@ export function WeatherReportWidget() {
         setError(err.message)
         setLoading(false)
       })
-  }, [])
+  }, [location])
 
   if (loading) {
     return (
@@ -68,7 +72,7 @@ export function WeatherReportWidget() {
   // Transform API response to match weather-analysis types
   const normalizedForecast: WeatherForecast[] = data.forecast.map(day => ({
     id: '',
-    location_id: day.location || 'suan-ban',
+    location_id: day.location || 'suan_ban',
     forecast_date: day.date,
     tc_min: day.temp_min ?? 0,
     tc_max: day.temp_max ?? 0,

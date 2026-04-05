@@ -7,31 +7,27 @@ import type { OrchardActivity, WeatherForecast, LatestActivities } from './types
 export async function getLatestActivities(): Promise<LatestActivities> {
   // Get latest watering
   const { data: wateringData } = await supabase
-    .from('orchard_activities')
+    .from('activity_logs')
     .select('*')
     .eq('activity_type', 'watering')
-    .is('deleted_at', null)
     .order('activity_date', { ascending: false })
     .limit(1)
     .single()
 
   // Get latest spraying
   const { data: sprayingData } = await supabase
-    .from('orchard_activities')
+    .from('activity_logs')
     .select('*')
     .eq('activity_type', 'spraying')
-    .is('deleted_at', null)
     .order('activity_date', { ascending: false })
     .limit(1)
     .single()
 
-  // Get latest fertilizing (can be fertilizing OR spraying with fertilizer in details)
+  // Get latest fertilizing
   const { data: fertilizingData } = await supabase
-    .from('orchard_activities')
+    .from('activity_logs')
     .select('*')
-    .in('activity_type', ['fertilizing', 'spraying'])
-    .not('details->fertilizer', 'is', null)
-    .is('deleted_at', null)
+    .eq('activity_type', 'fertilizing')
     .order('activity_date', { ascending: false })
     .limit(1)
     .single()
@@ -58,18 +54,20 @@ export async function getLatestActivities(): Promise<LatestActivities> {
 }
 
 /**
- * Get today's weather forecast for default location (suan-ban)
+ * Get today's weather forecast for a specific location
  * Note: Multiple forecasts may exist for same day, so use .limit(1) instead of .single()
  */
-export async function getTodayWeather(): Promise<WeatherForecast | null> {
+export async function getTodayWeather(
+  location: string = 'suan_ban'
+): Promise<WeatherForecast | null> {
   const today = new Date().toISOString().split('T')[0]
 
   const { data, error } = await supabase
     .from('weather_forecasts')
     .select('*')
     .eq('forecast_date', today)
-    .eq('location_id', 'suan-ban')
-    .limit(1)  // ← Changed from .single()
+    .eq('location_id', location)
+    .limit(1)
 
   if (error || !data || data.length === 0) {
     console.error('getTodayWeather error:', error)
@@ -86,7 +84,10 @@ export async function getTodayWeather(): Promise<WeatherForecast | null> {
  * Note: Multiple records may exist for the same day (duplicates),
  * so we deduplicate to ensure 1 record per day.
  */
-export async function getWeatherForecast(days: number = 7): Promise<WeatherForecast[]> {
+export async function getWeatherForecast(
+  days: number = 7,
+  location: string = 'suan_ban'
+): Promise<WeatherForecast[]> {
   const today = new Date().toISOString().split('T')[0]
   const endDate = new Date()
   endDate.setDate(endDate.getDate() + days)
@@ -97,7 +98,7 @@ export async function getWeatherForecast(days: number = 7): Promise<WeatherForec
     .select('*')
     .gte('forecast_date', today)
     .lte('forecast_date', endDateStr)
-    .eq('location_id', 'suan-ban')
+    .eq('location_id', location)
     .order('forecast_date', { ascending: true })
 
   if (error || !data) {
@@ -119,17 +120,22 @@ export async function getWeatherForecast(days: number = 7): Promise<WeatherForec
 }
 
 /**
- * Get last spraying activity
+ * Get last spraying activity for a specific plot
+ * @param plot - Optional plot filter
  */
-export async function getLastSpraying(): Promise<OrchardActivity | null> {
-  const { data, error } = await supabase
-    .from('orchard_activities')
+export async function getLastSpraying(plot?: string): Promise<OrchardActivity | null> {
+  let query = supabase
+    .from('activity_logs')
     .select('*')
     .eq('activity_type', 'spraying')
-    .is('deleted_at', null)
     .order('activity_date', { ascending: false })
     .limit(1)
-    .single()
+
+  if (plot) {
+    query = query.eq('plot_name', plot)
+  }
+
+  const { data, error } = await query.single()
 
   if (error || !data) {
     return null
