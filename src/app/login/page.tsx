@@ -9,10 +9,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [isSignUp, setIsSignUp] = useState(false)
   const router = useRouter()
 
-  const handleAuth = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
@@ -20,25 +19,13 @@ export default function LoginPage() {
     const supabase = createBrowserSupabaseClient()
 
     try {
-      if (isSignUp) {
-        // Sign up
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-        })
-        if (error) throw error
-        alert('✅ สมัครสำเร็จ! ตรวจสอบ email เพื่อ confirm')
-        setIsSignUp(false)
-      } else {
-        // Sign in
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        })
-        if (error) throw error
-        router.push('/dashboard')
-        router.refresh()
-      }
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+      if (error) throw error
+      router.push('/dashboard')
+      router.refresh()
     } catch (error: any) {
       setError(error.message || 'เกิดข้อผิดพลาด')
     } finally {
@@ -54,7 +41,7 @@ export default function LoginPage() {
             🌿 Oracle Dashboard
           </h1>
           <p className="text-sm text-neutral-600 mt-2">
-            {isSignUp ? 'สร้างบัญชีใหม่' : 'เข้าสู่ระบบ'}
+            เข้าสู่ระบบ
           </p>
         </div>
 
@@ -64,7 +51,7 @@ export default function LoginPage() {
           </div>
         )}
 
-        <form onSubmit={handleAuth} className="space-y-4">
+        <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-neutral-700 mb-1">
               Email
@@ -90,7 +77,7 @@ export default function LoginPage() {
               required
               minLength={6}
               className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              placeholder="อย่างน้อย 6 ตัวอักษร"
+              placeholder="รหัสผ่าน"
             />
           </div>
 
@@ -99,34 +86,9 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
-            {loading
-              ? '⏳ กำลังดำเนินการ...'
-              : isSignUp
-              ? '📝 สมัครสมาชิก'
-              : '🔐 เข้าสู่ระบบ'}
+            {loading ? '⏳ กำลังเข้าสู่ระบบ...' : '🔐 เข้าสู่ระบบ'}
           </button>
         </form>
-
-        <div className="mt-6 pt-4 border-t border-neutral-200">
-          <p className="text-sm text-center text-neutral-600">
-            {isSignUp ? 'มีบัญชีแล้ว?' : 'ยังไม่มีบัญชี?'}{' '}
-            <button
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="text-green-600 font-medium hover:underline"
-            >
-              {isSignUp ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก'}
-            </button>
-          </p>
-        </div>
-
-        <div className="mt-4 p-3 bg-blue-50 rounded text-xs text-blue-800">
-          <strong>💡 คำแนะนำ:</strong> สำหรับ 2 คน (คุณ + Oracle) ให้สมัครคนละ email
-          เช่น:
-          <br />
-          • your@email.com
-          <br />
-          • oracle@yourdomain.com
-        </div>
       </div>
     </div>
   )
