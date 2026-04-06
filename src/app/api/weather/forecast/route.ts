@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { getWeatherForecast } from '@/lib/queries'
 
+// Force dynamic rendering (route uses request.url)
+export const dynamic = 'force-dynamic'
+
 /**
  * Weather Forecast API
  *
