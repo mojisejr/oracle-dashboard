@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { getTodayWeather, getLastSpraying } from '@/lib/queries'
 
+// Force dynamic rendering (route uses request.url)
+export const dynamic = 'force-dynamic'
+
 /**
  * Spray Decision API
  *
